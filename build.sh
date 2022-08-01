@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+REPOSITORY="$(git remote -v | head -1 | awk '{print $2}')"
 BUILD_TIME="$(date --iso-8601=seconds)"
 COMMIT_SHA="$(git rev-parse HEAD 2>/dev/null && true)"
 
@@ -18,6 +19,7 @@ BUILD_USERNAME=$USER
 # Reference the build-time variables as <package>.<Varname>
 go build -o dist/filetime2date \
   -ldflags="-X main.Version=$COMMIT_TAG \
+    -X main.Repository=$REPOSITORY \
     -X main.BuildCommit=$COMMIT_SHA \
     -X main.BuildShortCommit=$COMMIT_SHORT_SHA \
     -X main.BranchName=$BRANCH_NAME \

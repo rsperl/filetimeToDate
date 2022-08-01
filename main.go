@@ -22,13 +22,30 @@ var (
 	BuildHostname    string
 	BuildUsername    string
 	Version          string
+	Repository       string
 )
+
+func boolify(val string) bool {
+	switch val {
+	case "1":
+		return true
+	case "true":
+		return true
+	case "yes":
+		return true
+	case "y":
+		return true
+	default:
+		return false
+	}
+}
 
 // GetBuildInfo returns a list of strings for either printing or logging
 func GetBuildInfo() []string {
 	longLine := strings.Replace(fmt.Sprintf("+%61s+", ""), " ", "-", 61)
 	return []string{
 		longLine,
+		fmt.Sprintf("| Repository:       %-41s |", Repository),
 		fmt.Sprintf("| Version:          %-41s |", Version),
 		fmt.Sprintf("| BuildTime:        %-41s |", BuildTime),
 		fmt.Sprintf("| BuildCommit:      %-41s |", BuildCommit),
@@ -48,8 +65,14 @@ func FiletimeToDate(filetime int64) time.Time {
 }
 
 func main() {
+	if boolify(os.Getenv("DEBUG")) {
+		for _, line := range GetBuildInfo() {
+			fmt.Println(line)
+		}
+	}
 	if len(os.Args) != 2 {
 		fmt.Printf("Usage: %s <filetime>\n", os.Args[0])
+		fmt.Printf("Set env var DEBUG to a truthy value to see build information")
 		os.Exit(1)
 	}
 	filetime, err := strconv.ParseInt(os.Args[1], 10, 64)
